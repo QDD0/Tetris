@@ -1,7 +1,9 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <iostream>
 
-const unsigned int X = 400;
+using namespace std;    
+
+const unsigned int X = 360;
 const unsigned int Y = 600;
 
 enum class GameState {
@@ -12,6 +14,11 @@ enum class GameState {
 class Tetris {
 public:
     void Run();
+};
+
+class Rectangle {
+public:
+
 };
 
 class Menu {
@@ -35,6 +42,11 @@ void Menu::Display(sf::RenderWindow& window) {
     sf::Font font;
     sf::Font font2;
 
+    sf::Image icon;
+    if (!icon.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\icon.png")) {
+        cout << "Failed to load icon" << endl;
+    }
+
     if (!font.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\Times New Roman.ttf")) {
         std::cerr << "Failed to load font" << std::endl;
         return;
@@ -44,6 +56,8 @@ void Menu::Display(sf::RenderWindow& window) {
 		std::cerr << "Failed to load font" << std::endl;
 		return;
 	}
+
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     text.setFont(font);
     text.setString("Play");
@@ -79,12 +93,39 @@ bool Menu::HandleClick(sf::Vector2f mousePos) {
 
 void Game::Display(sf::RenderWindow& window) {
     window.clear();
-    // Отображение игрового экрана (здесь можно добавить игровой контент)
+
+    sf::RectangleShape block(sf::Vector2f(20, 20));
+    block.setPosition(100, 100);
+    block.setFillColor(sf::Color::Red);
+
+    int cellSize = 30;
+    int numVerticalLines = window.getSize().x / cellSize + 1;
+    int numHorizontalLines = window.getSize().y / cellSize + 1;
+
+    sf::VertexArray grid(sf::Lines);
+
+    // Рисуем вертикальные линии
+    for (int i = 0; i <= numVerticalLines; ++i) {
+        float x = i * cellSize;
+        grid.append(sf::Vertex(sf::Vector2f(x, 30), sf::Color::White));
+        grid.append(sf::Vertex(sf::Vector2f(x, window.getSize().y), sf::Color::White));
+    }
+
+    // Рисуем горизонтальные линии
+    for (int i = 0; i <= numHorizontalLines; ++i) {
+        float y = i * cellSize;
+        grid.append(sf::Vertex(sf::Vector2f(2, y), sf::Color::White));
+        grid.append(sf::Vertex(sf::Vector2f(window.getSize().x, y), sf::Color::White));
+    }
+
+    window.draw(grid);
+    window.draw(block);
     window.display();
 }
 
+
 void Tetris::Run() {
-    sf::RenderWindow window(sf::VideoMode(X, Y), "Tetris");
+    sf::RenderWindow window(sf::VideoMode(X, Y), "Tetris", sf::Style::Close | sf::Style::Titlebar);
     GameState state = GameState::Menu;
     Menu menu;
     Game game;
