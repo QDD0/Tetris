@@ -37,8 +37,12 @@ public:
         block.setPosition(position);
     }
 
+    sf::Vector2f GetPosition() const {
+        return position;
+    }
+
 private:
-    sf::Vector2f position{ 0, 0 };
+    sf::Vector2f position{ 0, 0 };  
     sf::Texture texture;
     sf::Sprite block;
 };
@@ -51,14 +55,15 @@ public:
 
 class Game {
 public:
-    Game() : block() {}
+    Game() : block(), isFalling(true) {}
 
     void Display(sf::RenderWindow& window);
     void Update(float deltaTime);
 
 private:
-    Square block;
-    float fallSpeed = 100.0f;
+    Square block;  
+    float fallSpeed = 100.0f;  
+    bool isFalling;  
 };
 
 void Menu::Display(sf::RenderWindow& window) {
@@ -114,10 +119,7 @@ bool Menu::HandleClick(sf::Vector2f mousePos) {
     sf::RectangleShape button(sf::Vector2f(80, 20));
     button.setPosition(X / 2 - button.getSize().x / 2, Y / 2 - button.getSize().y / 2);
 
-    if (button.getGlobalBounds().contains(mousePos)) {
-        return true;
-    }
-    return false;
+    return button.getGlobalBounds().contains(mousePos);
 }
 
 void Game::Display(sf::RenderWindow& window) {
@@ -147,7 +149,13 @@ void Game::Display(sf::RenderWindow& window) {
 }
 
 void Game::Update(float deltaTime) {
-    block.Move(0, fallSpeed * deltaTime); 
+    if (isFalling) {
+        block.Move(0, fallSpeed * deltaTime);
+        
+        if (block.GetPosition().y + 61 > Y) {  
+            isFalling = false;
+        }
+    }
 }
 
 void Tetris::Run() {
@@ -156,7 +164,7 @@ void Tetris::Run() {
     Menu menu;
     Game game;
 
-    sf::Clock clock;
+    sf::Clock clock;  
 
     while (window.isOpen()) {
         sf::Event event;
@@ -174,13 +182,13 @@ void Tetris::Run() {
             }
         }
 
-        float deltaTime = clock.restart().asSeconds();
+        float deltaTime = clock.restart().asSeconds();  
 
         if (state == GameState::Menu) {
             menu.Display(window);
         }
         else if (state == GameState::Game) {
-            game.Update(deltaTime);
+            game.Update(deltaTime);  
             game.Display(window);
         }
     }
