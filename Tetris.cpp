@@ -1,7 +1,7 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <iostream>
 
-using namespace std;    
+using namespace std;
 
 const unsigned int X = 360;
 const unsigned int Y = 600;
@@ -16,9 +16,31 @@ public:
     void Run();
 };
 
-class Rectangle {
+class Square {
 public:
+    Square() {
+        if (!texture.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\Texturs\\Two.png")) {
+            cout << "Failed to load texture" << endl;
+        }
+        block.setTexture(texture);
+        block.setScale(0.16, 0.165);
+        block.setPosition(position);
+    }
 
+    void Draw(sf::RenderWindow& window) const {
+        window.draw(block);
+    }
+
+    void Move(float x, float y) {
+        position.x += x;
+        position.y += y;
+        block.setPosition(position);
+    }
+
+private:
+    sf::Vector2f position{ 0, 0 };
+    sf::Texture texture;
+    sf::Sprite block;
 };
 
 class Menu {
@@ -29,7 +51,14 @@ public:
 
 class Game {
 public:
+    Game() : block() {}
+
     void Display(sf::RenderWindow& window);
+    void Update(float deltaTime);
+
+private:
+    Square block;
+    float fallSpeed = 100.0f;
 };
 
 void Menu::Display(sf::RenderWindow& window) {
@@ -52,10 +81,10 @@ void Menu::Display(sf::RenderWindow& window) {
         return;
     }
 
-	if (!font2.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\Angeme-Regular.ttf")) {
-		std::cerr << "Failed to load font" << std::endl;
-		return;
-	}
+    if (!font2.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\Angeme-Regular.ttf")) {
+        std::cerr << "Failed to load font" << std::endl;
+        return;
+    }
 
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
@@ -64,11 +93,11 @@ void Menu::Display(sf::RenderWindow& window) {
     text.setCharacterSize(15);
     text.setFillColor(sf::Color::White);
 
-	StartText.setFont(font2);
-	StartText.setString("TETRIS");
-	StartText.setCharacterSize(30);
-	StartText.setFillColor(sf::Color::White);
-    StartText.setPosition(150, 200);
+    StartText.setFont(font2);
+    StartText.setString("TETRIS");
+    StartText.setCharacterSize(30);
+    StartText.setFillColor(sf::Color::White);
+    StartText.setPosition(135, 180);
 
     sf::FloatRect textRect = text.getLocalBounds();
     text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
@@ -76,7 +105,7 @@ void Menu::Display(sf::RenderWindow& window) {
 
     window.clear();
     window.draw(Startbutton);
-	window.draw(StartText);
+    window.draw(StartText);
     window.draw(text);
     window.display();
 }
@@ -94,41 +123,40 @@ bool Menu::HandleClick(sf::Vector2f mousePos) {
 void Game::Display(sf::RenderWindow& window) {
     window.clear();
 
-    sf::RectangleShape block(sf::Vector2f(20, 20));
-    block.setPosition(100, 100);
-    block.setFillColor(sf::Color::Red);
-
     int cellSize = 30;
     int numVerticalLines = window.getSize().x / cellSize + 1;
     int numHorizontalLines = window.getSize().y / cellSize + 1;
 
     sf::VertexArray grid(sf::Lines);
 
-    // Рисуем вертикальные линии
     for (int i = 0; i <= numVerticalLines; ++i) {
         float x = i * cellSize;
-        grid.append(sf::Vertex(sf::Vector2f(x, 30), sf::Color::White));
+        grid.append(sf::Vertex(sf::Vector2f(x, 0), sf::Color::White));
         grid.append(sf::Vertex(sf::Vector2f(x, window.getSize().y), sf::Color::White));
     }
 
-    // Рисуем горизонтальные линии
     for (int i = 0; i <= numHorizontalLines; ++i) {
         float y = i * cellSize;
-        grid.append(sf::Vertex(sf::Vector2f(2, y), sf::Color::White));
+        grid.append(sf::Vertex(sf::Vector2f(0, y), sf::Color::White));
         grid.append(sf::Vertex(sf::Vector2f(window.getSize().x, y), sf::Color::White));
     }
 
     window.draw(grid);
-    window.draw(block);
+    block.Draw(window);
     window.display();
 }
 
+void Game::Update(float deltaTime) {
+    block.Move(0, fallSpeed * deltaTime); 
+}
 
 void Tetris::Run() {
     sf::RenderWindow window(sf::VideoMode(X, Y), "Tetris", sf::Style::Close | sf::Style::Titlebar);
     GameState state = GameState::Menu;
     Menu menu;
     Game game;
+
+    sf::Clock clock;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -146,10 +174,13 @@ void Tetris::Run() {
             }
         }
 
+        float deltaTime = clock.restart().asSeconds();
+
         if (state == GameState::Menu) {
             menu.Display(window);
         }
         else if (state == GameState::Game) {
+            game.Update(deltaTime);
             game.Display(window);
         }
     }
