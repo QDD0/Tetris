@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    sf::Vector2f position{ 0, 0 };
+    sf::Vector2f position{ 0, 30 };
     sf::Texture texture;
     sf::Sprite block;
 };

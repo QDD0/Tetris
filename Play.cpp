@@ -68,7 +68,7 @@ void Game::Display(sf::RenderWindow& window) {
 
     for (int i = 0; i <= numVerticalLines; ++i) {
         float x = i * cellSize;
-        grid.append(sf::Vertex(sf::Vector2f(x, 0), sf::Color::White));
+        grid.append(sf::Vertex(sf::Vector2f(x, 30), sf::Color::White));
         grid.append(sf::Vertex(sf::Vector2f(x, window.getSize().y), sf::Color::White));
     }
 
