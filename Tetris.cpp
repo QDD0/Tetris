@@ -26,25 +26,31 @@ public:
 };
 
 void Menu::Display(sf::RenderWindow& window) {
-    sf::RectangleShape button(sf::Vector2f(80, 20));
-    button.setFillColor(sf::Color::Red);
-    button.setPosition(X / 2 - button.getSize().x / 2, Y / 2 - button.getSize().y / 2);
+    sf::RectangleShape Startbutton(sf::Vector2f(80, 20));
+    Startbutton.setFillColor(sf::Color::Red);
+    Startbutton.setPosition(X / 2 - Startbutton.getSize().x / 2, Y / 2 - Startbutton.getSize().y / 2);
 
     sf::Text text;
     sf::Text StartText;
     sf::Font font;
+    sf::Font font2;
 
     if (!font.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\Times New Roman.ttf")) {
         std::cerr << "Failed to load font" << std::endl;
         return;
     }
 
+	if (!font2.loadFromFile("C:\\Users\\denis\\Desktop\\Project\\Tetris\\Angeme-Regular.ttf")) {
+		std::cerr << "Failed to load font" << std::endl;
+		return;
+	}
+
     text.setFont(font);
     text.setString("Play");
     text.setCharacterSize(15);
     text.setFillColor(sf::Color::White);
 
-	StartText.setFont(font);
+	StartText.setFont(font2);
 	StartText.setString("TETRIS");
 	StartText.setCharacterSize(30);
 	StartText.setFillColor(sf::Color::White);
@@ -52,10 +58,10 @@ void Menu::Display(sf::RenderWindow& window) {
 
     sf::FloatRect textRect = text.getLocalBounds();
     text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
-    text.setPosition(button.getPosition().x + button.getSize().x / 2, button.getPosition().y + button.getSize().y / 2);
+    text.setPosition(Startbutton.getPosition().x + Startbutton.getSize().x / 2, Startbutton.getPosition().y + Startbutton.getSize().y / 2);
 
     window.clear();
-    window.draw(button);
+    window.draw(Startbutton);
 	window.draw(StartText);
     window.draw(text);
     window.display();
